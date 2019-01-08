@@ -29,7 +29,8 @@ class Cleaner
 	private static $allowedComposerTypes = [null, 'library', 'composer-plugin'];
 
 	/** @var string[] */
-	private static $alwaysIgnore = ['composer.json', 'license*', 'LICENSE*'];
+	//private static $alwaysIgnore = ['readme*', 'license.md'];
+	private static $alwaysIgnore = [];
 
 
 	public function __construct(IOInterface $io, Filesystem $fileSystem)
@@ -44,11 +45,11 @@ class Cleaner
 	 */
 	public function clean($vendorDir, array $ignorePaths = [])
 	{
-		foreach (new FilesystemIterator($vendorDir) as $packageVendor) {
+		foreach (new FileSystemIterator($vendorDir) as $packageVendor) {
 			if (!$packageVendor->isDir()) {
 				continue;
 			}
-			foreach (new FilesystemIterator($packageVendor) as $packageName) {
+			foreach (new FileSystemIterator($packageVendor) as $packageName) {
 				if (!$packageName->isDir()) {
 					continue;
 				}
@@ -98,8 +99,8 @@ class Cleaner
 
 		$ignoreFiles = array_merge($ignoreFiles, self::$alwaysIgnore);
 
-		foreach (new FilesystemIterator($packageDir) as $path) {
-			$fileName = $path->getFileName();
+		foreach (new FileSystemIterator($packageDir) as $path) {
+			$fileName = strtolower ($path->getFileName());
 			if (!self::matchMask($fileName, $ignoreFiles)) {
 				$this->io->write("Composer cleaner: Removing $path", true, IOInterface::VERBOSE);
 				$this->fileSystem->remove($path);
